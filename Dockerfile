@@ -17,12 +17,13 @@ RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.d
 RUN apt-get install -y git-lfs && \
     git lfs install
 
+RUN apt-get install -y spawn-fcgi
+
 # Clone Bosque's sources
 ARG BRANCH=master
 ADD http://worldclockapi.com/api/json/utc/now timestamp.json
 RUN git clone -b $BRANCH https://github.com/microsoft/BosqueLanguage.git bosque
 # Copy language tools for VSCode integration (syntax highlighting)
-RUN mkdir -p /root/.vscode-server/extensions && mv ./bosque/bosque-language-tools /root/.vscode-server/extensions
 WORKDIR /bosque/impl
 # Install Node packages
 RUN npm install --global --silent typescript
@@ -32,9 +33,13 @@ RUN npm run make-exe
 
 WORKDIR /
 
-RUN mkdir
+RUN mkdir src
 COPY ./src /src
 
 WORKDIR /src
 
-CMD ["/bin/bash"]
+RUN exegen script.bsq
+
+RUN ./a.out
+
+CMD ["cgi-fcgi -start -connect localhost:9000 ./a.out"]
