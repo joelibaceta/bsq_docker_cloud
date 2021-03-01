@@ -30,6 +30,11 @@ RUN npm install --silent
 # Make Bosque's exegen globally available
 RUN npm run make-exe
 
+WORKDIR /
+
+RUN mkdir
+COPY ./src /src
+
 WORKDIR /src
 
 CMD ["/bin/bash"]
