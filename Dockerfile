@@ -42,4 +42,6 @@ RUN exegen script.bsq
 
 RUN ./a.out
 
-CMD ["cgi-fcgi -start -connect localhost:9000 ./a.out"]
+#CMD ["spawn-fcgi -p 8000 -n /src/a.out"]
+
+CMD ["/bin/bash"]
