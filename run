@@ -1,1 +1,1 @@
-docker run -it --name bosque_app bosque
+docker run -it -P --name bosque_app bosque

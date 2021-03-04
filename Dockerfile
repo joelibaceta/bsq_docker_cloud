@@ -20,9 +20,12 @@ RUN apt-get install -y git-lfs && \
 RUN apt-get install -y spawn-fcgi
 
 # Clone Bosque's sources
-ARG BRANCH=master
-ADD http://worldclockapi.com/api/json/utc/now timestamp.json
-RUN git clone -b $BRANCH https://github.com/microsoft/BosqueLanguage.git bosque
+RUN echo "Cloning..."
+RUN git clone -b master https://github.com/joelibaceta/BosqueLanguage.git bosque
+
+#WORKDIR /bosque
+#ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+#RUN git pull origin master
 # Copy language tools for VSCode integration (syntax highlighting)
 WORKDIR /bosque/impl
 # Install Node packages
@@ -34,14 +37,21 @@ RUN npm run make-exe
 WORKDIR /
 
 RUN mkdir src
-COPY ./src /src
+COPY . /
 
 WORKDIR /src
 
-RUN exegen script.bsq
+RUN exegen script.bsq -o bosquebin --entrypoint "NSMain::runner"
 
-RUN ./a.out
+WORKDIR /
+
+RUN ls
+
+RUN npm install
+
+
+EXPOSE 8081
+#RUN ./bosquebin -60 2 3 4 3 7 9 8 12
 
 #CMD ["spawn-fcgi -p 8000 -n /src/a.out"]
-
-CMD ["/bin/bash"]
+CMD ["node", "server.js"]
